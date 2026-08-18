@@ -1,8 +1,9 @@
 /** Stage a symlink-free production runtime for Electron's extraResources. */
 import { spawn } from 'node:child_process'
 import { existsSync } from 'node:fs'
-import { copyFile, cp, lstat, mkdir, readFile, readdir, realpath, rm, writeFile } from 'node:fs/promises'
+import { cp, lstat, mkdir, readFile, readdir, realpath, rm } from 'node:fs/promises'
 import { dirname, join, resolve, sep } from 'node:path'
+import { stageElectronPackage as stageElectronPackageFiles } from './package-staging.mjs'
 
 const root = resolve(import.meta.dirname, '../..')
 const source = join(import.meta.dirname, 'runtime-package')
@@ -55,22 +56,7 @@ console.log(`prepare-runtime: staged packaged runtime in ${staging}`)
 
 async function stageElectronPackage() {
   const manifest = JSON.parse(await readFile(join(import.meta.dirname, 'package.json'), 'utf8'))
-  const packagedManifest = {
-    name: manifest.name,
-    productName: manifest.productName,
-    version: manifest.version,
-    private: true,
-    type: 'module',
-    main: 'main.mjs',
-    license: manifest.license,
-  }
-  await mkdir(packageStaging, { recursive: true })
-  await Promise.all([
-    cp(join(import.meta.dirname, 'assets'), join(packageStaging, 'assets'), { recursive: true }),
-    copyFile(join(import.meta.dirname, 'config.mjs'), join(packageStaging, 'config.mjs')),
-    copyFile(join(import.meta.dirname, 'main.mjs'), join(packageStaging, 'main.mjs')),
-    writeFile(join(packageStaging, 'package.json'), `${JSON.stringify(packagedManifest, null, 2)}\n`),
-  ])
+  await stageElectronPackageFiles(import.meta.dirname, packageStaging, manifest)
 }
 
 async function restoreDirectDependencies() {
