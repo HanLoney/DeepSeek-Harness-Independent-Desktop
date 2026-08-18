@@ -183,7 +183,7 @@
   box-sizing: border-box;
   border: 1px solid var(--dsw-alias-border-l2);
   border-radius: 12px;
-  background: var(--dsw-alias-button-elevated-fill);
+  background: var(--dsh-custom-background-new-session-fill, var(--dsw-alias-button-elevated-fill));
   color: var(--dsw-alias-label-primary);
   font-size: 14px;
   font-weight: 500;

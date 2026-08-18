@@ -63,4 +63,11 @@ describe('SidebarRoot.module.css', () => {
     expect(declarations('.collapsed .newSession')?.get('align-self')).toBe('flex-start')
     expect(declarations('.collapsed .newSession')?.get('width')).toBe('36px')
   })
+
+  it('lets the expanded New Session fill follow a custom background', () => {
+    expect(declarations('.newSession')?.get('background')).toBe(
+      'var(--dsh-custom-background-new-session-fill, var(--dsw-alias-button-elevated-fill))',
+    )
+    expect(declarations('.collapsed .newSession')?.get('background')).toBe('transparent')
+  })
 })

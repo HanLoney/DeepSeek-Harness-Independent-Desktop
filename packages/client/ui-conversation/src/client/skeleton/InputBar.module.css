@@ -68,7 +68,7 @@
      l2-darkmode-thin pair. Fill: the input surface token (elevated in dark). */
   border: 1px solid var(--dsw-alias-border-l2-darkmode-thin);
   border-radius: 22px;
-  background: var(--dsw-specific-input-major);
+  background: var(--dsh-custom-background-composer-fill, var(--dsw-specific-input-major));
   box-shadow: var(--dsw-shadow-lv2);
   font-size: 16px;
   line-height: 24px;

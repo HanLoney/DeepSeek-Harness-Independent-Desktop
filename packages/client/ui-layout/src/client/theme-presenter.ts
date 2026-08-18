@@ -3,7 +3,8 @@
  * document — `html { color-scheme }` for native UA chrome (scrollbars, form
  * controls), `body[data-ds-dark-theme]` for the token palette, the active
  * theme's alias-token overrides as inline CSS variables on body, the optional
- * user background image, and one
+ * user background image with opacity-matched base, sidebar, New Session, and
+ * composer fills, and one
  * presenter-owned `meta[name="theme-color"]` for surrounding browser UI. Pure
  * DOM writes, no React involvement; the presenter only ever retracts what it
  * wrote itself, so foreign attributes, metadata, and inline styles survive.
@@ -53,6 +54,9 @@ export class ThemePresenter {
       this.clearBackground(body)
     } else {
       const surfaceAlpha = (1 - snapshot.backgroundOpacity).toFixed(2)
+      const customSurfaces = scheme === 'dark'
+        ? { newSession: '67, 69, 74', composer: '44, 44, 46' }
+        : { newSession: '255, 255, 255', composer: '255, 255, 255' }
       body.style.setProperty('background-image', `url(${JSON.stringify(snapshot.background)})`)
       body.style.setProperty('background-size', 'cover')
       body.style.setProperty('background-position', 'center')
@@ -64,7 +68,14 @@ export class ThemePresenter {
       body.style.setProperty('--dsw-specific-sidebar-fill', scheme === 'dark'
         ? `rgba(27, 27, 28, ${surfaceAlpha})`
         : `rgba(249, 250, 251, ${surfaceAlpha})`)
-      this.appliedTokens.push('--dsw-alias-bg-base', '--dsw-specific-sidebar-fill')
+      body.style.setProperty('--dsh-custom-background-new-session-fill', `rgba(${customSurfaces.newSession}, ${surfaceAlpha})`)
+      body.style.setProperty('--dsh-custom-background-composer-fill', `rgba(${customSurfaces.composer}, ${surfaceAlpha})`)
+      this.appliedTokens.push(
+        '--dsw-alias-bg-base',
+        '--dsw-specific-sidebar-fill',
+        '--dsh-custom-background-new-session-fill',
+        '--dsh-custom-background-composer-fill',
+      )
       this.hasBackground = true
     }
     this.themeColorMeta.content = getComputedStyle(body).backgroundColor

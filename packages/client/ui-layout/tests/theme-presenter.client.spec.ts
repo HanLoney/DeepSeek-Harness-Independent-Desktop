@@ -87,11 +87,26 @@ describe('ThemePresenter', () => {
     expect(document.body.style.backgroundImage).toContain('data:image/png;base64,AA==')
     expect(document.body.style.getPropertyValue('--dsw-alias-bg-base')).toBe('rgba(21, 21, 23, 0.58)')
     expect(document.body.style.getPropertyValue('--dsw-specific-sidebar-fill')).toBe('rgba(27, 27, 28, 0.58)')
+    expect(document.body.style.getPropertyValue('--dsh-custom-background-new-session-fill')).toBe('rgba(67, 69, 74, 0.58)')
+    expect(document.body.style.getPropertyValue('--dsh-custom-background-composer-fill')).toBe('rgba(44, 44, 46, 0.58)')
     presenter.apply({ ...snapshot('dark'), background: 'data:image/png;base64,AA==', backgroundOpacity: 0.8 })
     expect(document.body.style.getPropertyValue('--dsw-alias-bg-base')).toBe('rgba(21, 21, 23, 0.20)')
+    expect(document.body.style.getPropertyValue('--dsh-custom-background-new-session-fill')).toBe('rgba(67, 69, 74, 0.20)')
+    expect(document.body.style.getPropertyValue('--dsh-custom-background-composer-fill')).toBe('rgba(44, 44, 46, 0.20)')
     presenter.apply(snapshot('light'))
     expect(document.body.style.backgroundImage).toBe('')
     expect(document.body.style.getPropertyValue('--dsw-alias-bg-base')).toBe('')
+    expect(document.body.style.getPropertyValue('--dsh-custom-background-new-session-fill')).toBe('')
+    expect(document.body.style.getPropertyValue('--dsh-custom-background-composer-fill')).toBe('')
+  })
+
+  it('uses light palette fills for background-aware controls', () => {
+    const presenter = new ThemePresenter()
+    presenter.apply({
+      ...snapshot('light'), background: 'data:image/png;base64,AA==', backgroundOpacity: 0.42,
+    })
+    expect(document.body.style.getPropertyValue('--dsh-custom-background-new-session-fill')).toBe('rgba(255, 255, 255, 0.58)')
+    expect(document.body.style.getPropertyValue('--dsh-custom-background-composer-fill')).toBe('rgba(255, 255, 255, 0.58)')
   })
 
   it('dispose removes color-scheme, the attribute, and every applied variable, sparing foreign inline styles', () => {
