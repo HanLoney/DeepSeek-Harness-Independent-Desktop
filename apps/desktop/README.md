@@ -17,7 +17,7 @@ The Electron process uses the user's Documents directory as the default Harness 
 
 The General settings page includes theme selection, a custom background image, and a deployment-wide personalized prompt. The desktop window, tray, installer, and uninstaller use the checked-in black DeepSeek icon assets.
 
-With the native frame enabled, Electron places the operating-system window controls over a transparent 36-pixel draggable strip. The strip only reserves title-bar space; it adds no fill, blur, shadow, or component styling.
+With the native frame enabled, Electron places the operating-system window controls over a transparent 36-pixel draggable strip. The Session header starts below that strip, so its actions never share the window controls' row; neither rule adds fill, blur, shadow, or component styling.
 
 Build a Windows installer with `pnpm desktop:dist`. The command stages the complete production dependency closure from `apps/desktop/runtime-package`, assembles the standalone layout, and writes the installer under `apps/desktop/release/`. The generated `package/`, `runtime/`, and `release/` directories are build products and are ignored by Git.
 

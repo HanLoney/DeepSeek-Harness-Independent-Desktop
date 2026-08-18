@@ -6,7 +6,7 @@ This repository is a developer preview. Security fixes are applied to the latest
 
 ## Reporting a vulnerability
 
-Please do not disclose credentials, API keys, private configuration files, or an exploitable proof of concept in a public issue. Use GitHub's private vulnerability reporting for [HanLoney/Deepseek-harness-desktop](https://github.com/HanLoney/Deepseek-harness-desktop/security/advisories/new) when it is available. If private reporting is unavailable, open a minimal public issue asking for a private contact channel without including sensitive details.
+Please do not disclose credentials, API keys, private configuration files, or an exploitable proof of concept in a public issue. Use GitHub's private vulnerability reporting for [HanLoney/DeepSeek-Harness-Independent-Desktop](https://github.com/HanLoney/DeepSeek-Harness-Independent-Desktop/security/advisories/new) when it is available. If private reporting is unavailable, open a minimal public issue asking for a private contact channel without including sensitive details.
 
 When reporting, include the affected commit, operating system, reproduction steps, impact, and any safe mitigation. Do not attach `.env` files, logs containing tokens, session stores, or generated runtime directories.
 

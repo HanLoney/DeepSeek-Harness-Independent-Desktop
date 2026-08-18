@@ -1,10 +1,10 @@
-# DeepSeek Harness Desktop
+# DeepSeek Harness 独立桌面版
 
 中文 | [English](README.md)
 
-**DeepSeek Harness Desktop** 是基于 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的开源 Electron 桌面发行版，面向 Windows 桌面使用场景。
+**DeepSeek Harness 独立桌面版**是基于 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的开源独立 Electron 发行版，面向 Windows 桌面使用场景。
 
-它直接承载 Harness 原有的 Web UI，保留插件化 Agent 运行时、模型提供方、Agent preset、会话与设置；桌面进程只负责原生窗口生命周期、托盘和呈现。桌面版代码位于 [`apps/desktop`](apps/desktop/)，发行仓库为 [HanLoney/Deepseek-harness-desktop](https://github.com/HanLoney/Deepseek-harness-desktop)。
+它直接承载 Harness 原有的 Web UI，保留插件化 Agent 运行时、模型提供方、Agent preset、会话与设置；桌面进程只负责原生窗口生命周期、托盘和呈现。桌面版代码位于 [`apps/desktop`](apps/desktop/)，发行仓库为 [HanLoney/DeepSeek-Harness-Independent-Desktop](https://github.com/HanLoney/DeepSeek-Harness-Independent-Desktop)。
 
 ## 桌面版特性
 
@@ -38,8 +38,8 @@ npx @deepseek-ai/dsh web
 如需从本仓库源码运行：
 
 ```sh
-git clone https://github.com/HanLoney/Deepseek-harness-desktop.git
-cd Deepseek-harness-desktop
+git clone https://github.com/HanLoney/DeepSeek-Harness-Independent-Desktop.git
+cd DeepSeek-Harness-Independent-Desktop
 pnpm install
 pnpm run build
 pnpm dsh web

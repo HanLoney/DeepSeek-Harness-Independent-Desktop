@@ -26,5 +26,7 @@ test('ships a transparent draggable desktop title bar', async () => {
   const css = await readFile(new URL('../assets/desktop-titlebar.css', import.meta.url), 'utf8')
   assert.match(css, /-webkit-app-region:\s*drag/)
   assert.match(css, /#root/)
+  assert.match(css, /\[data-slot='conversation\.session\.header'\]\s*>\s*header/)
+  assert.match(css, /padding-top:\s*calc\(12px \+ var\(--dsh-desktop-titlebar-height\)\)/)
   assert.doesNotMatch(css, /backdrop-filter|background\s*:/)
 })

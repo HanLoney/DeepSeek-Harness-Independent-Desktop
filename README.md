@@ -1,10 +1,10 @@
-# DeepSeek Harness Desktop
+# DeepSeek Harness Independent Desktop
 
 [中文](README.zh.md) | English
 
-**DeepSeek Harness Desktop** is an open-source Electron desktop distribution of [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) for Windows desktop use.
+**DeepSeek Harness Independent Desktop** is an open-source, standalone Electron distribution of [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) for Windows desktop use.
 
-It hosts the existing Harness Web UI directly, keeping the plugin-based Agent runtime, model providers, Agent presets, sessions, and settings intact. The desktop process owns only native window lifecycle, tray behavior, and presentation. Desktop code lives in [`apps/desktop`](apps/desktop/), and the distribution is maintained at [HanLoney/Deepseek-harness-desktop](https://github.com/HanLoney/Deepseek-harness-desktop).
+It hosts the existing Harness Web UI directly, keeping the plugin-based Agent runtime, model providers, Agent presets, sessions, and settings intact. The desktop process owns only native window lifecycle, tray behavior, and presentation. Desktop code lives in [`apps/desktop`](apps/desktop/), and the distribution is maintained at [HanLoney/DeepSeek-Harness-Independent-Desktop](https://github.com/HanLoney/DeepSeek-Harness-Independent-Desktop).
 
 ## Desktop edition
 
@@ -38,8 +38,8 @@ The command starts the Web UI, served at `http://127.0.0.1:3080` by default. See
 To run this distribution from source:
 
 ```sh
-git clone https://github.com/HanLoney/Deepseek-harness-desktop.git
-cd Deepseek-harness-desktop
+git clone https://github.com/HanLoney/DeepSeek-Harness-Independent-Desktop.git
+cd DeepSeek-Harness-Independent-Desktop
 pnpm install
 pnpm run build
 pnpm dsh web

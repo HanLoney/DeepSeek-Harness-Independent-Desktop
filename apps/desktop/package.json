@@ -11,7 +11,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/HanLoney/Deepseek-harness-desktop.git",
+    "url": "git+https://github.com/HanLoney/DeepSeek-Harness-Independent-Desktop.git",
     "directory": "apps/desktop"
   },
   "files": [

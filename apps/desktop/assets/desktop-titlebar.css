@@ -15,3 +15,7 @@ body::before {
   height: calc(100% - var(--dsh-desktop-titlebar-height));
   margin-top: var(--dsh-desktop-titlebar-height);
 }
+
+#root [data-slot='conversation.session.header'] > header {
+  padding-top: calc(12px + var(--dsh-desktop-titlebar-height));
+}
