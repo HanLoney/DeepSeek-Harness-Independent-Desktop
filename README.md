@@ -1,12 +1,21 @@
-# DeepSeek Harness
+# DeepSeek Harness Desktop
 
-English | [中文](README.zh.md)
+[中文](README.zh.md) | English
 
-DeepSeek Harness (`dsh`) is an open-source agent harness developed by [DeepSeek AI](https://deepseek.com).
+**DeepSeek Harness Desktop** is an open-source Electron desktop distribution of [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) for Windows desktop use.
 
-This repository also ships **DeepSeek Harness Desktop**, a configurable Electron host for the Harness Web UI. The desktop edition keeps the Harness plugin/runtime architecture intact while adding a native Windows window, tray lifecycle, custom backgrounds and opacity, personalized prompts, a thinking-intensity slider, and black DeepSeek icon assets. It is maintained as an independent community distribution at [HanLoney/Deepseek-harness-desktop](https://github.com/HanLoney/Deepseek-harness-desktop), while the upstream project remains [deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness).
+It hosts the existing Harness Web UI directly, keeping the plugin-based Agent runtime, model providers, Agent presets, sessions, and settings intact. The desktop process owns only native window lifecycle, tray behavior, and presentation. Desktop code lives in [`apps/desktop`](apps/desktop/), and the distribution is maintained at [HanLoney/Deepseek-harness-desktop](https://github.com/HanLoney/Deepseek-harness-desktop).
 
-It uses an architecture where **everything is a plugin**, and is powered by [Cordis](https://github.com/cordiverse/cordis), whose design is described in [_A Programming Paradigm for Spatiotemporal Composability_](https://github.com/cordiverse/paper).
+## Desktop edition
+
+- Native Electron window, transparent title bar, frameless mode, always-on-top mode, and start-minimized behavior.
+- Tray residency, close-to-tray behavior, window toggle, and reload shortcuts.
+- Theme selection, custom background images, background opacity, and a deployment-wide personalized prompt.
+- Model selection and the conversation-level reasoning-effort control remain part of the Harness Web UI.
+- A separate desktop configuration file, optional custom CSS, and the user's Documents directory as the default Harness workspace.
+- Black DeepSeek icons, desktop and Start menu shortcuts, and unsigned Windows x64 installers.
+
+The runtime uses an architecture where **everything is a plugin**, powered by [Cordis](https://github.com/cordiverse/cordis), whose design is described in [_A Programming Paradigm for Spatiotemporal Composability_](https://github.com/cordiverse/paper).
 
 ## Developer preview
 
@@ -26,15 +35,17 @@ The command starts the Web UI, served at `http://127.0.0.1:3080` by default. See
 
 ### Run from source
 
-To run from a repository checkout:
+To run this distribution from source:
 
 ```sh
-git clone https://github.com/deepseek-ai/deepseek-harness.git
-cd deepseek-harness
+git clone https://github.com/HanLoney/Deepseek-harness-desktop.git
+cd Deepseek-harness-desktop
 pnpm install
 pnpm run build
 pnpm dsh web
 ```
+
+For the upstream project without the desktop host, use [deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness).
 
 ### Run the desktop application
 
@@ -46,7 +57,7 @@ pnpm run build
 pnpm desktop
 ```
 
-The first launch creates a desktop configuration file under `%APPDATA%/DeepSeek Harness Desktop/`. Use the **应用** menu to open that folder or reload the configuration. The desktop host supports a custom CSS file, window/tray behavior, keyboard shortcuts, a custom background image with live opacity, and a deployment-wide personalized prompt. See the [desktop guide](apps/desktop/README.md) for the complete configuration reference and [中文说明](apps/desktop/README.zh.md).
+The first launch creates a desktop configuration file under `%APPDATA%/DeepSeek Harness Desktop/`. Use the **应用** menu to open that folder or reload the configuration. See the [Chinese desktop guide](apps/desktop/README.zh.md) for the complete configuration reference.
 
 To assemble an unsigned Windows installer, run `pnpm desktop:dist`. Build products are written below `apps/desktop/release/` and are intentionally ignored by Git. Code signing, automatic updates, and macOS/Linux installers are not included in this preview.
 

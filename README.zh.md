@@ -1,10 +1,19 @@
-# DeepSeek Harness
+# DeepSeek Harness Desktop
 
-[English](README.md) | 中文
+中文 | [English](README.md)
 
-DeepSeek Harness（`dsh`）是由 [DeepSeek AI](https://deepseek.com) 开发的开源 agent harness（智能体框架）。
+**DeepSeek Harness Desktop** 是基于 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的开源 Electron 桌面发行版，面向 Windows 桌面使用场景。
 
-本仓库同时提供 **DeepSeek Harness Desktop**：一个可高度配置的 Electron 桌面宿主，用于承载 Harness Web UI。桌面版保留 Harness 的插件与运行时架构，并增加原生 Windows 窗口、托盘生命周期、自定义背景与透明度、个性化提示词、思考强度滑条以及黑色 DeepSeek 图标资源。桌面版作为独立的社区发行仓库维护于 [HanLoney/Deepseek-harness-desktop](https://github.com/HanLoney/Deepseek-harness-desktop)，上游项目仍是 [deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness)。
+它直接承载 Harness 原有的 Web UI，保留插件化 Agent 运行时、模型提供方、Agent preset、会话与设置；桌面进程只负责原生窗口生命周期、托盘和呈现。桌面版代码位于 [`apps/desktop`](apps/desktop/)，发行仓库为 [HanLoney/Deepseek-harness-desktop](https://github.com/HanLoney/Deepseek-harness-desktop)。
+
+## 桌面版特性
+
+- 原生 Electron 窗口、透明标题栏、无边框模式、置顶和最小化启动。
+- 托盘驻留、关闭到托盘、显示/隐藏窗口与重新加载快捷键。
+- 主题选择、自定义背景图片、背景透明度和部署级个性化提示词。
+- 会话内模型选择与思考强度调节继续由 Harness Web UI 提供。
+- 独立桌面配置文件、可选自定义 CSS，以及默认使用用户“文档”目录的 Harness workspace。
+- 黑色 DeepSeek 图标、桌面快捷方式、开始菜单入口和未签名 Windows x64 安装程序。
 
 它采用**一切皆插件**的架构，并由 [Cordis](https://github.com/cordiverse/cordis) 驱动，其设计参见论文 [_A Programming Paradigm for Spatiotemporal Composability_](https://github.com/cordiverse/paper)。
 
@@ -26,15 +35,17 @@ npx @deepseek-ai/dsh web
 
 ### 从源码运行
 
-如需从仓库源码运行：
+如需从本仓库源码运行：
 
 ```sh
-git clone https://github.com/deepseek-ai/deepseek-harness.git
-cd deepseek-harness
+git clone https://github.com/HanLoney/Deepseek-harness-desktop.git
+cd Deepseek-harness-desktop
 pnpm install
 pnpm run build
 pnpm dsh web
 ```
+
+如果只需要上游项目，不需要桌面宿主，请使用 [deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness)。
 
 ### 运行桌面应用
 
@@ -46,7 +57,7 @@ pnpm run build
 pnpm desktop
 ```
 
-首次启动会在 `%APPDATA%/DeepSeek Harness Desktop/` 下创建桌面配置文件。可通过**应用**菜单打开配置所在文件夹或重新加载配置。桌面宿主支持自定义 CSS、窗口与托盘行为、键盘快捷键、带实时透明度预览的自定义背景图片，以及部署级个性化提示词。完整配置字段请参阅[桌面端说明](apps/desktop/README.md)和[中文说明](apps/desktop/README.zh.md)。
+首次启动会在 `%APPDATA%/DeepSeek Harness Desktop/` 下创建桌面配置文件。可通过**应用**菜单打开配置所在文件夹或重新加载配置。完整配置字段请参阅[桌面端中文说明](apps/desktop/README.zh.md)。
 
 运行 `pnpm desktop:dist` 可组装未签名的 Windows 安装程序。构建产物写入 `apps/desktop/release/`，并且已由 Git 忽略。当前预览版不包含代码签名、自动更新以及 macOS/Linux 安装程序。
 

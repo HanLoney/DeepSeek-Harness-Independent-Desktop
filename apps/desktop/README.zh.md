@@ -1,6 +1,6 @@
 # `@deepseek-ai/dsh-desktop`
 
-[English](README.md) | 中文
+中文 | [English](README.md)
 
 桌面应用通过 Electron 承载现有的 `dsh web` 产品。它让随附的 `@deepseek-ai/dsh` 启动器监听由操作系统分配的回环端口，等到启动器输出就绪地址后，再在沙箱窗口中加载该地址。模型提供方、Agent preset、插件、会话和设置仍由 Harness profile 管理；桌面进程只增加原生窗口生命周期与呈现。
 

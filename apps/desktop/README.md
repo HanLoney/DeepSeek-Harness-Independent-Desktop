@@ -1,6 +1,6 @@
 # `@deepseek-ai/dsh-desktop`
 
-English | [中文](README.zh.md)
+[中文](README.zh.md) | English
 
 The desktop application hosts the existing `dsh web` product in Electron. It starts the shipped `@deepseek-ai/dsh` launcher on an OS-assigned loopback port, waits for its readiness line, and loads that URL in a sandboxed window. Model providers, Agent presets, plugins, sessions, and settings remain owned by the Harness profile; the desktop process adds native window lifecycle and presentation only.
 
