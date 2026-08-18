@@ -10,7 +10,7 @@
 
 **只支持与宿主共享文件系统和内核的限制。** 后端与宿主共享文件系统和内核（`bwrap`、Landlock、Seatbelt）；`workspaceRoot` 指向文件系统规范化后的真实主机目录。系统先解析工作区所指的目录，再做词法规范化，因此包含 `symlink/..` 的有效 cwd 会授权 `chdir` 实际到达的目录，而非无关的词法父目录。容器、microVM 与远程执行器都不是该 seam 的后端：它们会以环境一致的分组替换整个能力 seam 的 Service Provider（`ctx.shell`、`ctx.fs`）。边界及其设计理由见[沙箱 Agent Note](../../../.agents/notes/implemented/feature/2026-07-06-sandbox.md)。
 
-实现：[`@deepseek-ai/dsh-sandbox-local`](../sandbox-local/)（Linux：`bwrap`，否则使用相应平台的 Landlock launcher；macOS：`sandbox-exec`／Seatbelt）。消费方：[`@deepseek-ai/dsh-bash-sandbox`](../../shell/bash-sandbox/)（包装 `['bash', '-c', command]`）。
+实现：[`@deepseek-ai/dsh-sandbox-local`](../sandbox-local/)（Linux：`bwrap`，否则使用相应平台的 Landlock launcher；macOS：`sandbox-exec`／Seatbelt）。消费方：[`@deepseek-ai/dsh-bash-sandbox`](../../shell/bash-sandbox/)（包装 `['bash', '-c', command]`）和 [`@deepseek-ai/dsh-pwsh-sandbox`](../../shell/pwsh-sandbox/)（包装 PowerShell 调用）。
 
 ## 模型体验
 
@@ -18,7 +18,7 @@
 
 #### 模型看到的内容
 
-通过 [`dsh-bash-sandbox`](../../shell/bash-sandbox/README.md) 和 [`dsh-tool-bash`](../../shell/tool-bash/README.md)，无法强制执行所请求模式时会产生错误码 `SANDBOX_UNAVAILABLE` 及以下精确错误。执行期 runner 失败会追加 ` Runner failure: <detail>`。
+通过 `dsh-bash-sandbox`／`dsh-tool-bash` 和 [`dsh-pwsh-sandbox`](../../shell/pwsh-sandbox/README.md)／`dsh-tool-pwsh`，无法强制执行所请求模式时会产生错误码 `SANDBOX_UNAVAILABLE` 及以下精确错误。执行期 runner 失败会追加 ` Runner failure: <detail>`。
 
 ##### 精确错误
 
@@ -33,6 +33,20 @@ sandbox mode "<mode>" is requested but no sandbox backend is usable on this host
 #### KV Cache 影响
 
 仅追加；新可见内容位于可复用请求前缀之后，不会使现有 KV Cache 条目失效。
+
+### 间接的升权解释
+
+#### 模型看到的内容
+
+通过 [`dsh-tool-bash`](../../shell/tool-bash/README.md)、[`dsh-tool-pwsh`](../../shell/tool-pwsh/README.md) 和 [`dsh-tool-fs`](../../fs/tool-fs/README.md)，若 `sandbox_permissions` 是已知目标且等于或窄于有效模式，则该字段及其理由会被忽略；调用按常驻策略执行且不发起批准。真正更宽的请求必须携带非空理由，并在执行前通过批准。
+
+#### Token 影响
+
+未拓宽请求的归一化不会添加诊断。无效或失败的更宽请求会对该次调用可见，并保留在历史中直到压缩（compaction）。
+
+#### KV Cache 影响
+
+仅追加；受限调用产生的诊断位于可复用请求前缀之后，不会使现有 KV Cache 条目失效。
 
 ## 已知限制与暂缓事项
 

@@ -86,10 +86,13 @@ export interface NormalizeOptions {
 function cwdSpellings(ctx: NormalizeContext): string[] {
   const spellings = [...new Set([ctx.cwd, ...ctx.cwdAliases ?? []])]
     .filter(spelling => spelling.length > 0)
+  const escapedWindowsSpellings = spellings
+    .filter(spelling => /^[A-Za-z]:\\/.test(spelling))
+    .map(spelling => spelling.replaceAll('\\', '\\\\'))
   const macAliases = spellings
     .filter(spelling => spelling.startsWith('/') && !spelling.startsWith('/private/'))
     .map(spelling => `/private${spelling}`)
-  return [...new Set([...spellings, ...macAliases])]
+  return [...new Set([...spellings, ...escapedWindowsSpellings, ...macAliases])]
     .sort((left, right) => right.length - left.length)
 }
 

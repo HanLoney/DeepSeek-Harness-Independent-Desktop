@@ -13,7 +13,7 @@
 import type { Context } from '@deepseek-ai/cordis'
 import type { ToolExecution } from '@deepseek-ai/dsh-tools'
 import type { SandboxExecutionPolicy, SandboxMode } from '@deepseek-ai/dsh-sandbox'
-import { ESCALATION_TARGETS, approveEscalation, escalationHintMarker, sandboxDenialMarker, validateEscalationArgs } from '@deepseek-ai/dsh-sandbox'
+import { ESCALATION_TARGETS, approveEscalation, escalationHintMarker, resolveEscalationArgs, sandboxDenialMarker } from '@deepseek-ai/dsh-sandbox'
 import type { SandboxPolicyService } from '@deepseek-ai/dsh-sandbox-policy'
 import { FsError } from '@deepseek-ai/dsh-fs'
 
@@ -62,12 +62,13 @@ export class FsSandboxController {
         type: 'string',
         enum: [...this.escalationModes],
         description: 'The wider sandbox mode this file operation needs. Only valid as a one-shot retry '
-          + 'of an operation the sandbox just denied; requires justification and user approval.',
+          + 'of an operation the sandbox just denied; requires justification and user approval. Ignored '
+          + 'when it is not wider than the current DSH file policy.',
       },
       justification: {
         type: 'string',
-        description: 'Required with sandbox_permissions: one sentence for the user explaining '
-          + 'why this exact file operation needs the wider access.',
+        description: 'Required with a genuinely wider sandbox_permissions target: one sentence for the user '
+          + 'explaining why this exact file operation needs the wider access. Ignored with a redundant target.',
       },
     }
   }
@@ -76,8 +77,8 @@ export class FsSandboxController {
    * The policy to stamp onto this mutation: an approved escalation grant (a
    * strictly wider retry resolved through `ctx.approval` before anything
    * executes), else the session's standing mode. The calling session's cwd is
-   * always carried as the workspace root. Validates the escalation argument
-   * pairing first.
+   * always carried as the workspace root. Non-widening fields are inert;
+   * genuinely wider calls validate pairing before requesting approval.
    * @param toolName - the mutating tool's name, for the approval audit trail.
    * @param args - the call's escalation arguments.
    * @param exec - the tool-execution context (agent, callId, signal).
@@ -85,17 +86,15 @@ export class FsSandboxController {
    *   unsandboxed backend.
    */
   async resolvePolicy(toolName: string, args: FsEscalationArgs, exec: ToolExecution): Promise<SandboxExecutionPolicy | undefined> {
-    validateEscalationArgs(args.sandbox_permissions, args.justification)
     const standingPolicy = this.policy?.resolve({ ...exec.agent ? { session: exec.agent.session } : {} })
-    if (args.sandbox_permissions === undefined || args.justification === undefined) {
-      return standingPolicy
-    }
+    const escalation = resolveEscalationArgs(args.sandbox_permissions, args.justification, standingPolicy?.mode, 'operation')
+    if (escalation === undefined) return standingPolicy
     if (this.escalationModes.length === 0) {
       throw new Error('sandbox_permissions is not available in this composition (no sandboxing filesystem to escalate)')
     }
     const policy = standingPolicy as SandboxExecutionPolicy
     const approvedMode = await approveEscalation(
-      { requestedMode: args.sandbox_permissions, justification: args.justification, effectiveMode: policy.mode, subject: 'operation' },
+      { ...escalation, effectiveMode: policy.mode, subject: 'operation' },
       {
         approver: this.ctx.get('approval'),
         agent: exec.agent,

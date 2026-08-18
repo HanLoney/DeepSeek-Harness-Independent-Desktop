@@ -815,7 +815,7 @@ describe('sandbox escalation API (write/edit)', () => {
   function fsSchema(ctx: Context, name: 'write' | 'edit') {
     const schema = ctx.tools.schemas().find(s => s.name === name)
     if (!schema) throw new Error(`${name} tool not registered`)
-    return schema as unknown as { parameters: { properties: Record<string, { enum?: string[] }> } }
+    return schema as unknown as { parameters: { properties: Record<string, { enum?: string[]; description?: string }> } }
   }
 
   it('fails load when a confining filesystem has no shared sandbox-policy resolver', async () => {
@@ -841,6 +841,8 @@ describe('sandbox escalation API (write/edit)', () => {
     for (const name of ['write', 'edit'] as const) {
       const props = fsSchema(ctx, name).parameters.properties
       expect(props['sandbox_permissions']?.enum).toEqual(['workspace-write', 'danger-full-access'])
+      expect(props['sandbox_permissions']?.description).toContain('Ignored when it is not wider than the current DSH file policy')
+      expect(props['justification']?.description).toContain('Ignored with a redundant target')
       expect(props['justification']).toBeDefined()
     }
   })
@@ -915,9 +917,31 @@ describe('sandbox escalation API (write/edit)', () => {
 
   it('rejects the escalation argument pairing (one field without the other)', async () => {
     const { ctx } = await setupConfining()
-    const missing = await call(ctx, 'write', { file_path: 'a.txt', content: 'x', sandbox_permissions: 'workspace-write' }, escalationAgent())
+    const missing = await call(ctx, 'write', { file_path: 'a.txt', content: 'x', sandbox_permissions: 'workspace-write' }, escalationAgent([{ type: 'sandbox/mode', data: { mode: 'read-only' } }]))
     expect(missing.isError).toBe(true)
     expect(text(missing)).toContain('sandbox_permissions requires a justification')
+  })
+
+  it('ignores recognized non-widening targets and executes with the standing policy', async () => {
+    const { ctx, fs } = await setupConfining()
+    const sameLevel = await call(ctx, 'write', {
+      file_path: 'a.txt',
+      content: 'x',
+      sandbox_permissions: 'workspace-write',
+      justification: '',
+    }, escalationAgent())
+    const fullAccess = await call(ctx, 'write', {
+      file_path: 'a.txt',
+      content: 'x',
+      sandbox_permissions: 'danger-full-access',
+      justification: '',
+    }, escalationAgent([{ type: 'sandbox/mode', data: { mode: 'danger-full-access' } }]))
+    expect(sameLevel.isError).toBe(false)
+    expect(fullAccess.isError).toBe(false)
+    expect(fs.stamped).toEqual([
+      { mode: 'workspace-write', workspaceRoot: resolve('/session-project') },
+      { mode: 'danger-full-access', workspaceRoot: resolve('/session-project') },
+    ])
   })
 
   it('sandbox_permissions under a non-confining backend fails closed (unadvertised field still reaches execute)', async () => {

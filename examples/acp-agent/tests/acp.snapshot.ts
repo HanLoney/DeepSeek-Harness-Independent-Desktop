@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { mkdir, utimes, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
-import { homedir } from 'node:os'
+import { homedir, tmpdir } from 'node:os'
 import { expect, it } from 'vitest'
 import { defineAcpSnapshotSuite, type Scenario, type SnapshotSuiteOptions } from '@deepseek-ai/dsh-acp-snapshot'
 import { resolvePwshPath } from '@deepseek-ai/dsh-pwsh-local'
@@ -318,6 +318,19 @@ const SCENARIOS: Scenario[] = [
   },
   { name: 'fs-read', hasModelTurn: true, recorded: true },
   { name: 'fs-write', hasModelTurn: true, recorded: true },
+  // Authored replay of a model that emits escalation fields even though the
+  // session already has full access. The assembled write tool ignores those
+  // inert fields and completes the mutation without an approval or error loop.
+  { name: 'full-access-redundant-escalation', hasModelTurn: true, recorded: false },
+  // The same adapter behavior must be inert when workspace-write is already
+  // active and the requested target merely repeats that standing policy.
+  {
+    name: 'workspace-write-redundant-escalation',
+    hasModelTurn: true,
+    recorded: false,
+    env: { DSH_PERMISSION_MODE: 'workspace-write' },
+    workspaceParent: tmpdir(),
+  },
   { name: 'fs-edit', hasModelTurn: true, recorded: true },
   { name: 'fs-write-overwrite', hasModelTurn: true, recorded: true },
   // An overwrite whose replacement is at/above the configured diff-basis bound:

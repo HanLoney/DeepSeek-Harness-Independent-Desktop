@@ -1,6 +1,6 @@
 /**
  * Tests for the shared escalation vocabulary and choreography: the strictly-
- * wider ladder, the argument-pairing validation, the model-facing markers, and
+ * wider ladder, the argument resolution, the model-facing markers, and
  * {@link approveEscalation}'s ordered fail-closed sequence. Both enforcing tool
  * families (`dsh-tool-bash`, `dsh-tool-fs`) delegate here, so the ordering and
  * verbatim texts are pinned once, next to the vocabulary that owns them.
@@ -12,8 +12,8 @@ import {
   WIDER_MODES,
   approveEscalation,
   escalationHintMarker,
+  resolveEscalationArgs,
   sandboxDenialMarker,
-  validateEscalationArgs,
 } from '@deepseek-ai/dsh-sandbox'
 import type { EscalationApprover, EscalationOutcome } from '@deepseek-ai/dsh-sandbox'
 
@@ -29,16 +29,36 @@ describe('the strictly-wider ladder', () => {
   })
 })
 
-describe('validateEscalationArgs', () => {
-  it('accepts neither field, or both with a non-empty justification', () => {
-    expect(() => { validateEscalationArgs(undefined, undefined) }).not.toThrow()
-    expect(() => { validateEscalationArgs('workspace-write', 'because the workspace needs it') }).not.toThrow()
+describe('resolveEscalationArgs', () => {
+  it('returns no request for omitted fields and a validated request for a paired justification', () => {
+    expect(resolveEscalationArgs(undefined, undefined)).toBeUndefined()
+    expect(resolveEscalationArgs('workspace-write', 'because the workspace needs it')).toEqual({
+      requestedMode: 'workspace-write',
+      justification: 'because the workspace needs it',
+    })
   })
 
   it('rejects one field without the other, and a blank justification', () => {
-    expect(() => { validateEscalationArgs('workspace-write', undefined) }).toThrow(/requires a justification/)
-    expect(() => { validateEscalationArgs(undefined, 'orphan reason') }).toThrow(/only valid together with sandbox_permissions/)
-    expect(() => { validateEscalationArgs('workspace-write', '   ') }).toThrow(/non-empty sentence/)
+    expect(() => { resolveEscalationArgs('workspace-write', undefined) }).toThrow(/requires a justification/)
+    expect(() => { resolveEscalationArgs(undefined, 'orphan reason') }).toThrow(/only valid together with sandbox_permissions/)
+    expect(() => { resolveEscalationArgs('workspace-write', '   ') }).toThrow(/non-empty sentence.*omit both escalation fields/)
+  })
+
+  it('ignores a recognized target that does not widen the effective mode', () => {
+    for (const justification of [undefined, '', 'already granted'] as const) {
+      expect(resolveEscalationArgs('workspace-write', justification, 'workspace-write', 'command')).toBeUndefined()
+    }
+  })
+
+  it('ignores every escalation-field combination under full access', () => {
+    for (const [sandboxPermissions, justification] of [
+      [undefined, undefined],
+      ['danger-full-access', ''],
+      ['workspace-write', undefined],
+      [undefined, 'orphan reason'],
+    ] as const) {
+      expect(resolveEscalationArgs(sandboxPermissions, justification, 'danger-full-access', 'command')).toBeUndefined()
+    }
   })
 })
 
@@ -87,7 +107,7 @@ describe('approveEscalation', () => {
     await expect(approveEscalation(req({ requestedMode: 'read-only' }), spy))
       .rejects.toThrow(/not strictly wider than this call's current "read-only" mode/)
     await expect(approveEscalation(req({ requestedMode: 'workspace-write', effectiveMode: 'danger-full-access' as never }), spy))
-      .rejects.toThrow(/not strictly wider/)
+      .rejects.toThrow(/not strictly wider.*no wider sandbox mode exists.*without sandbox_permissions or justification/)
     expect(seen).toEqual([])
   })
 

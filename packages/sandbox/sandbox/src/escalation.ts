@@ -1,7 +1,7 @@
 /**
  * The escalation vocabulary and choreography shared by every sandbox-enforcing
  * tool family (`@deepseek-ai/dsh-tool-bash`, `@deepseek-ai/dsh-tool-fs`): the
- * strictly-wider ladder, the argument-pairing validation, the model-facing
+ * strictly-wider ladder, the argument resolution, the model-facing
  * denial/hint markers, and {@link approveEscalation} — the ordered fail-closed
  * sequence that resolves a `sandbox_permissions` request through a
  * user-approval channel BEFORE anything executes. One home keeps the two
@@ -41,14 +41,62 @@ export const WIDER_MODES: Record<string, readonly SandboxMode[]> = {
 export const ESCALATION_TARGETS: readonly SandboxMode[] = ['workspace-write', 'danger-full-access']
 
 /**
- * Validate the escalation argument pairing a tool schema cannot express:
- * `sandbox_permissions` and `justification` travel together — an approval
- * prompt without a reason, or a reason driving nothing, is a malformed ask —
- * and the justification must be a non-empty sentence.
+ * Describe a non-widening request with the correction the caller can apply.
+ * The approval check remains fail-closed for callers that bypass
+ * {@link resolveEscalationArgs}.
+ * @param mode - the requested target mode.
+ * @param effectiveMode - the call's current mode.
+ * @param subject - the operation noun used in the correction.
+ * @returns the complete model-facing diagnostic.
+ */
+function nonWideningMessage(mode: string, effectiveMode: SandboxMode, subject: string): string {
+  const prefix = `sandbox escalation to "${mode}" is not strictly wider than this call's current "${effectiveMode}" mode`
+  const widerModes = WIDER_MODES[effectiveMode] ?? []
+  if (effectiveMode === 'danger-full-access') {
+    return `${prefix}; no wider sandbox mode exists, so retry this ${subject} without sandbox_permissions or justification`
+  }
+  if (widerModes.length > 0) {
+    const targets = widerModes.map(target => `"${target}"`).join(' or ')
+    return `${prefix}; request ${targets} with a non-empty justification after a denial, or omit both fields if this ${subject} does not need escalation`
+  }
+  return `${prefix}; the current sandbox mode has no recognized wider target`
+}
+
+/** A validated escalation request that still needs approval. */
+export interface ResolvedEscalationArgs {
+  /** The strictly wider sandbox mode requested for this call. */
+  requestedMode: string
+  /** The non-empty reason shown to the user in the approval request. */
+  justification: string
+}
+
+/**
+ * Resolve raw tool arguments into an escalation that still needs approval.
+ * A recognized target that is equal to or narrower than the effective mode is
+ * inert and ignored because it cannot add authority. Under
+ * `danger-full-access`, every field combination is inert. A genuinely wider
+ * target requires a paired, non-empty justification.
  * @param sandboxPermissions - the raw `sandbox_permissions` argument, if given.
  * @param justification - the raw `justification` argument, if given.
+ * @param effectiveMode - the call's current mode, when policy has already been resolved.
+ * @param subject - the operation noun used in a non-widening correction.
+ * @returns the validated request, or `undefined` when no approval is needed.
  */
-export function validateEscalationArgs(sandboxPermissions: string | undefined, justification: string | undefined): void {
+export function resolveEscalationArgs(
+  sandboxPermissions: string | undefined,
+  justification: string | undefined,
+  effectiveMode?: SandboxMode,
+  subject = 'operation',
+): ResolvedEscalationArgs | undefined {
+  if (effectiveMode !== undefined && effectiveMode !== 'danger-full-access' && WIDER_MODES[effectiveMode] === undefined) {
+    throw new Error(nonWideningMessage(sandboxPermissions ?? '<omitted>', effectiveMode, subject))
+  }
+  if (effectiveMode === 'danger-full-access') return undefined
+  if (sandboxPermissions !== undefined && effectiveMode !== undefined
+    && !(WIDER_MODES[effectiveMode] ?? []).includes(sandboxPermissions as SandboxMode)) {
+    if (ESCALATION_TARGETS.includes(sandboxPermissions as SandboxMode)) return undefined
+    throw new Error(nonWideningMessage(sandboxPermissions, effectiveMode, subject))
+  }
   if (sandboxPermissions !== undefined && justification === undefined) {
     throw new Error('invalid escalation: sandbox_permissions requires a justification')
   }
@@ -56,8 +104,10 @@ export function validateEscalationArgs(sandboxPermissions: string | undefined, j
     throw new Error('invalid escalation: justification is only valid together with sandbox_permissions')
   }
   if (justification !== undefined && justification.trim().length === 0) {
-    throw new Error('invalid justification: expected a non-empty sentence')
+    throw new Error('invalid justification: expected a non-empty sentence; provide one with sandbox_permissions, or omit both escalation fields')
   }
+  if (sandboxPermissions === undefined || justification === undefined) return undefined
+  return { requestedMode: sandboxPermissions, justification }
 }
 
 /**
@@ -160,7 +210,7 @@ export async function approveEscalation<A, C>(request: EscalationRequest, approv
   // deliberately not a schema constraint (the enum is the closed target
   // vocabulary; the effective mode is per-call truth).
   if (!(WIDER_MODES[effectiveMode] ?? []).includes(mode as SandboxMode)) {
-    throw new Error(`sandbox escalation to "${mode}" is not strictly wider than this call's current "${effectiveMode}" mode`)
+    throw new Error(nonWideningMessage(mode, effectiveMode, subject))
   }
   if (approval.approver === undefined) {
     throw new Error(`sandbox escalation to "${mode}" requires approval, but no approval service is composed`)

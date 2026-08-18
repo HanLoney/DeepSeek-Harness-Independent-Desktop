@@ -555,8 +555,10 @@ describe('sandbox escalation through ctx.approval', () => {
   it('advertises the sandbox fields, the escalation clause, and the confined-mode contracts', async () => {
     const { ctx } = await setupSandboxed()
     const schema = ctx.tools.schemas().find(item => item.name === 'pwsh')!
-    const properties = schema.parameters.properties as Record<string, { enum?: string[] }>
+    const properties = schema.parameters.properties as Record<string, { enum?: string[]; description?: string }>
     expect(properties['sandbox_permissions']?.enum).toEqual(['workspace-write', 'danger-full-access'])
+    expect(properties['sandbox_permissions']?.description).toContain('Ignored when it is not wider than the current DSH file policy')
+    expect(properties['justification']?.description).toContain('Ignored with a redundant target')
     expect(schema.description).toContain('approval prompt')
     expect(schema.description).toContain('ConstrainedLanguage')
     expect(schema.description).toContain('workspace-write stays in FullLanguage')
@@ -581,16 +583,38 @@ describe('sandbox escalation through ctx.approval', () => {
     expect(schema.parameters.properties).not.toHaveProperty('sandbox_permissions')
   })
 
-  it('rejects injected escalation without a sandbox and non-widening escalation without prompting', async () => {
+  it('rejects unavailable escalation, but ignores recognized non-widening targets', async () => {
     const plain = await setup()
     expect(text(await call(plain.ctx, 'pwsh', escalate))).toContain('not available in this composition')
 
-    const { ctx } = await setupSandboxed(true)
+    const { ctx, bash } = await setupSandboxed(true)
     const prompted = vi.fn()
     ctx.on('approval/request', () => { prompted(); return Promise.resolve<ApprovalOutcome>('allowed-once') })
-    const result = await call(ctx, 'pwsh', { ...escalate, sandbox_permissions: 'workspace-write' }, sandboxAgent('workspace-write'))
-    expect(text(result)).toContain('not strictly wider')
+    const result = await call(ctx, 'pwsh', {
+      ...escalate,
+      sandbox_permissions: 'workspace-write',
+      justification: '',
+    }, sandboxAgent('workspace-write'))
+    expect(result.isError).toBe(false)
     expect(prompted).not.toHaveBeenCalled()
+
+    for (const sandbox_permissions of ['workspace-write', 'danger-full-access']) {
+      const fullAccess = await call(ctx, 'pwsh', {
+        command: 'Write-Output ok',
+        description: 'full access correction',
+        sandbox_permissions,
+        justification: '',
+      }, sandboxAgent('danger-full-access'))
+      expect(fullAccess.isError).toBe(false)
+    }
+    const justificationOnly = await call(ctx, 'pwsh', {
+      command: 'Write-Output ok',
+      description: 'full access correction',
+      justification: 'this field is unnecessary under full access',
+    }, sandboxAgent('danger-full-access'))
+    expect(justificationOnly.isError).toBe(false)
+    expect(prompted).not.toHaveBeenCalled()
+    expect(bash.modes).toEqual(['workspace-write', 'danger-full-access', 'danger-full-access', 'danger-full-access'])
 
     const malformed = sandboxAgent()
     ;(malformed.session.events as unknown as Array<{ type: string; data: { mode: string } }>).push({

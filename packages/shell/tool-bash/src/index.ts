@@ -20,7 +20,7 @@ import type {} from '@deepseek-ai/dsh-jobs'
 import type {} from '@deepseek-ai/dsh-user-approval'
 import type {} from '@deepseek-ai/dsh-shell-env'
 import type { SandboxExecutionPolicy, SandboxMode } from '@deepseek-ai/dsh-sandbox'
-import { ESCALATION_TARGETS, approveEscalation, canonicalPath, validateEscalationArgs } from '@deepseek-ai/dsh-sandbox'
+import { ESCALATION_TARGETS, approveEscalation, canonicalPath, resolveEscalationArgs } from '@deepseek-ai/dsh-sandbox'
 import type { SandboxPolicyService } from '@deepseek-ai/dsh-sandbox-policy'
 import { DSH_ENV_PREFIX } from '@deepseek-ai/dsh-shell'
 import type { ShellRunResult } from '@deepseek-ai/dsh-shell'
@@ -62,9 +62,6 @@ function validateBashArgs(args: BashToolArgs): void {
   if (args.timeoutMs !== undefined && (!Number.isFinite(args.timeoutMs) || args.timeoutMs <= 0)) {
     throw new Error(`invalid timeoutMs: expected a positive number, got ${JSON.stringify(args.timeoutMs)}`)
   }
-  // The escalation pairing (sandbox_permissions ⇔ justification, non-empty) is
-  // the shared rule both enforcing families validate identically.
-  validateEscalationArgs(args.sandbox_permissions, args.justification)
 }
 
 function bashDescription(backgroundEnabled: boolean, escalationModes: readonly SandboxMode[]): string {
@@ -86,6 +83,8 @@ function bashDescription(backgroundEnabled: boolean, escalationModes: readonly S
     + 'plus a one-sentence `justification`. Do not detour through chat to ask permission first — the '
     + 'approval prompt raised by that retry is how the user consents. If the session states approval '
     + 'prompts are disabled, there is no exception: a denial is final — do not set `sandbox_permissions`. '
+    + 'A `sandbox_permissions` target that is not wider than the current DSH file policy is redundant; '
+    + 'it and its `justification` are ignored and the command uses the standing policy. '
     + 'Never escalate speculatively: ground the request in a real denial — normally the one this command '
     + 'just hit; escalating up front is fine only when this session already denied the same access. '
     + 'A rejected escalation is final for that command — stop and explain, never work around '
@@ -260,11 +259,11 @@ export function apply(ctx: Context, config: Config = {}): void {
         sandbox_permissions: {
           type: 'string' as const,
           enum: [...escalationModes],
-          description: 'The wider sandbox mode this command needs. Only valid as a one-shot retry of a command the sandbox just denied; requires justification and user approval.',
+          description: 'The wider sandbox mode this command needs. Only valid as a one-shot retry of a command the sandbox just denied; requires justification and user approval. Ignored when it is not wider than the current DSH file policy.',
         },
         justification: {
           type: 'string' as const,
-          description: 'Required with sandbox_permissions: one sentence for the user explaining why this exact command needs the wider access.',
+          description: 'Required with a genuinely wider sandbox_permissions target: one sentence for the user explaining why this exact command needs the wider access. Ignored with a redundant target.',
         },
       } : {},
     },
@@ -331,8 +330,9 @@ export function apply(ctx: Context, config: Config = {}): void {
       validateBashArgs(args)
       // Description is display metadata; workdir defaults to the caller's session.
       const standingPolicy = resolveSandboxPolicy(exec)
-      const approvedMode = args.sandbox_permissions !== undefined && args.justification !== undefined
-        ? await approveBashEscalation(args.sandbox_permissions, args.justification, exec, standingPolicy)
+      const escalation = resolveEscalationArgs(args.sandbox_permissions, args.justification, standingPolicy?.mode, 'command')
+      const approvedMode = escalation !== undefined
+        ? await approveBashEscalation(escalation.requestedMode, escalation.justification, exec, standingPolicy)
         : undefined
       const policy = approvedMode === undefined
         ? standingPolicy

@@ -354,6 +354,18 @@ describe('normalizeSessionLog', () => {
       .toContain(String.raw`{{cwd}}\\nested\\proof.txt`)
   })
 
+  it('scrubs a JSON-escaped Windows cwd embedded in runtime-context text', () => {
+    const windowsCtx: NormalizeContext = { sessionIds: [], cwd: String.raw`C:\work\snapshot` }
+    const ev = JSON.stringify({
+      type: 'user/message', seq: 2, time: 5,
+      data: { text: `Session workspace: ${JSON.stringify(windowsCtx.cwd)}.` },
+    })
+    const out = normalizeSessionLog(`${header({ cwd: windowsCtx.cwd })}\n${ev}\n`, windowsCtx)
+    const normalizedEvent = JSON.parse(out.trim().split('\n')[1] as string) as { data: { text: string } }
+    expect(normalizedEvent.data.text).toBe('Session workspace: "{{cwd}}".')
+    expect(out).not.toContain(String.raw`C:\\work\\snapshot`)
+  })
+
   it('scrubs the session id in the header', () => {
     const out = normalizeSessionLog(`${header({ id: ctx.sessionIds[0] })}\n`, ctx)
     expect(out).toContain('{{sessionId}}')
