@@ -51,7 +51,6 @@ describe('WorkspaceBrowser.module.css list', () => {
     expect(listArea?.get('margin-left')).toBe('-4px')
     expect(listArea?.get('padding-left')).toBe('4px')
     expect(listArea?.get('margin-right')).toBe('calc(-1 * var(--dsh-session-list-edge-inset))')
-    expect(declarations('.fade')?.get('right')).toBe('var(--dsh-session-list-edge-inset)')
     expect(list?.get('margin-right')).toBe('var(--dsh-session-list-scrollbar-offset)')
     expect(list?.get('margin-left')).toBe('-4px')
     expect(list?.get('padding-left')).toBe('4px')
@@ -96,8 +95,12 @@ describe('WorkspaceBrowser.module.css list', () => {
     }
   })
 
-  it('keeps the compact fade, overflow control, search field, and row heights', () => {
-    expect(declarations('.fade')?.get('height')).toBe('24px')
+  it('keeps the masked fade, overflow control, search field, and row heights', () => {
+    const treeBody = declarations('.treeBody')
+    expect(treeBody?.get('--dsh-session-list-bottom-fade')).toBe('24px')
+    expect(treeBody?.get('mask-image')).toContain('transparent 100%')
+    expect(treeBody?.get('-webkit-mask-image')).toBe(treeBody?.get('mask-image'))
+    expect(declarations('.fade')).toBeUndefined()
     expect(declarations('.sessionOverflowButton')?.get('height')).toBe('28px')
     expect(declarations('.searchExpanded')?.get('height')).toBe('30px')
     expect(rowDeclarations('.projectRow')?.get('height')).toBe('34px')

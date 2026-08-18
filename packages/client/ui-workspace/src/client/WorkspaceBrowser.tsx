@@ -537,7 +537,6 @@ function SessionTree({
           )
         })}
       </div>
-      <span className={css.fade} />
     </div>
   )
 }
@@ -657,7 +656,6 @@ function FlatList({
           )
         })}
       </div>
-      <span className={css.fade} />
     </div>
   )
 }
@@ -728,7 +726,6 @@ function SearchResults({
           </div>
         )}
       </div>
-      <span className={css.fade} />
     </div>
   )
 }
