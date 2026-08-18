@@ -1,0 +1,17 @@
+:root {
+  --dsh-desktop-titlebar-height: 36px;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0 138px auto 0;
+  z-index: 2147483647;
+  height: var(--dsh-desktop-titlebar-height);
+  -webkit-app-region: drag;
+}
+
+#root {
+  height: calc(100% - var(--dsh-desktop-titlebar-height));
+  margin-top: var(--dsh-desktop-titlebar-height);
+}

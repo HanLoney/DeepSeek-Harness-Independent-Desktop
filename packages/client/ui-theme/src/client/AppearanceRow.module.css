@@ -1,0 +1,155 @@
+/* Appearance row (figma 'Frame 2117131228': title + cube row, column gap 8,
+ * pad 16/0, hairline separator; the section column strips it when last). */
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--dsw-alias-border-l2);
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+  color: var(--dsw-alias-label-primary);
+}
+
+.cubeRow {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Appearance cube (figma '.Selector Cube' 276x82 r16, pad 20/32, centered
+ * icon-over-label column, gap 4); flexed down from the figma width so all
+ * three sit on one row in the 800 panel, wrapping when narrower. */
+.themeCube {
+  box-sizing: border-box;
+  flex: 1 1 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 20px 32px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 16px;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--dsw-alias-label-primary);
+  cursor: pointer;
+}
+
+.themeCube:hover:not(.selected) {
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+
+/* Selected cube: #F5F6F7 fill + #ADB2B8 border (static token — the bluish-400
+ * step has no alias-layer name). */
+.selected {
+  background: var(--dsw-alias-bg-module-platform);
+  border-color: var(--dsw-static-neutral-bluish-400);
+}
+
+.customSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.customTitle {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--dsw-alias-label-primary);
+}
+
+.customActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.backgroundPreview {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  height: 128px;
+  object-fit: cover;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 10px;
+}
+
+.opacityHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.opacitySlider {
+  width: 100%;
+  margin: 0;
+  accent-color: var(--dsw-alias-state-business-primary);
+  cursor: pointer;
+}
+
+.actionButton,
+.secondaryButton {
+  min-height: 34px;
+  padding: 6px 12px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 6px;
+  background: var(--dsw-alias-bg-layer-1);
+  color: var(--dsw-alias-label-primary);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.actionButton:hover,
+.secondaryButton:hover {
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+
+.secondaryButton {
+  color: var(--dsw-alias-label-secondary);
+}
+
+.promptInput {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 96px;
+  resize: vertical;
+  padding: 10px 12px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 6px;
+  background: var(--dsw-alias-bg-layer-1);
+  color: var(--dsw-alias-label-primary);
+  font: inherit;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.promptInput:focus {
+  outline: 2px solid var(--dsw-alias-state-business-primary);
+  outline-offset: 1px;
+}
+
+.error {
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-state-error-primary);
+}

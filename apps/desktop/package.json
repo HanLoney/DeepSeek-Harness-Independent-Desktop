@@ -1,0 +1,70 @@
+{
+  "name": "@deepseek-ai/dsh-desktop",
+  "description": "Configurable Electron host for the DeepSeek Harness Web application",
+  "productName": "DeepSeek Harness Desktop",
+  "version": "0.1.0-rc.5",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "main.mjs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HanLoney/Deepseek-harness-desktop.git",
+    "directory": "apps/desktop"
+  },
+  "files": [
+    "assets",
+    "config.mjs",
+    "main.mjs"
+  ],
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test tests/*.test.mjs",
+    "dist": "tsx prepare-runtime.mjs && tsx assemble-windows.mjs && electron-builder --prepackaged release/win-unpacked --win nsis"
+  },
+  "devDependencies": {
+    "@electron/asar": "3.4.1",
+    "app-builder-lib": "26.15.3",
+    "electron": "43.4.0",
+    "electron-builder": "26.15.3",
+    "tsx": "^4.22.4"
+  },
+  "build": {
+    "appId": "ai.deepseek.harness.desktop",
+    "productName": "DeepSeek Harness Desktop",
+    "artifactName": "DeepSeek-Harness-Desktop-${version}-${arch}.${ext}",
+    "asar": true,
+    "npmRebuild": false,
+    "directories": {
+      "app": "package",
+      "output": "release"
+    },
+    "extraResources": [
+      {
+        "from": "runtime",
+        "to": "runtime"
+      }
+    ],
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico"
+    }
+  }
+}
