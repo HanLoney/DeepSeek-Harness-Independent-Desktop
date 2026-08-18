@@ -39,7 +39,7 @@ Invalid field types, ranges, colors, shortcut registrations, and unreadable cust
 
 ## Security and limitations
 
-The renderer has Node integration disabled, context isolation and Chromium sandboxing enabled, and permission requests denied. Navigation remains on the selected loopback origin; HTTP and HTTPS links open in the default browser.
+The renderer has Node integration disabled, context isolation and Chromium sandboxing enabled. Its main frame may write sanitized text to the host clipboard from the selected loopback origin; clipboard reads, subframe writes, and all other permission requests are denied. Navigation remains on that origin, while HTTP and HTTPS links open in the default browser.
 
 The desktop application currently reuses the browser HTTP/WebSocket carrier rather than adding a second IPC implementation. This keeps every client plugin on the same tested transport and limits the desktop process to lifecycle and presentation. The [desktop-host decision](../../.agents/notes/implemented/feature/2026-08-17-configurable-electron-desktop-host.md) owns that trade-off.
 

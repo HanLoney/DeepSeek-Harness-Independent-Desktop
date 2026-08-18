@@ -2,7 +2,7 @@
   "name": "@deepseek-ai/dsh-desktop",
   "description": "Configurable Electron host for the DeepSeek Harness Web application",
   "productName": "DeepSeek Harness Desktop",
-  "version": "0.1.0-rc.5",
+  "version": "0.1.0-rc.6",
   "publishConfig": {
     "access": "public"
   },
@@ -17,7 +17,8 @@
   "files": [
     "assets",
     "config.mjs",
-    "main.mjs"
+    "main.mjs",
+    "permissions.mjs"
   ],
   "scripts": {
     "start": "electron .",

@@ -39,7 +39,7 @@ Electron 进程默认使用用户的“文档”目录作为 Harness workspace�
 
 ## 安全性与限制
 
-渲染器关闭 Node 集成，启用上下文隔离和 Chromium 沙箱，并拒绝权限请求。页面只能留在选定的回环源；HTTP 和 HTTPS 链接会交给默认浏览器打开。
+渲染器关闭 Node 集成，并启用上下文隔离和 Chromium 沙箱。只有选定回环源中的主框架可以向系统剪贴板写入净化后的文本；剪贴板读取、子框架写入和其他权限请求一律拒绝。页面只能留在该源；HTTP 和 HTTPS 链接会交给默认浏览器打开。
 
 桌面应用目前复用浏览器的 HTTP／WebSocket 载体，不另建一套 IPC 实现。这样所有 client 插件继续使用同一条已验证的传输链，桌面进程只负责生命周期与呈现。[桌面宿主决策](../../.agents/notes/implemented/feature/2026-08-17-configurable-electron-desktop-host.md)记录了这一取舍。
 

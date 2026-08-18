@@ -6,6 +6,7 @@ import { dirname, isAbsolute, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { app, BrowserWindow, dialog, globalShortcut, Menu, nativeImage, shell, Tray } from 'electron'
 import { loadConfig, runtimeDependencyPath } from './config.mjs'
+import { allowsRendererPermission } from './permissions.mjs'
 
 const require = createRequire(import.meta.url)
 const sourceRoot = fileURLToPath(new URL('../..', import.meta.url))
@@ -201,7 +202,15 @@ async function createWindow(url) {
     event.preventDefault()
     if (/^https?:\/\//i.test(target)) void shell.openExternal(target)
   })
-  mainWindow.webContents.session.setPermissionRequestHandler((_contents, _permission, callback) => callback(false))
+  mainWindow.webContents.session.setPermissionCheckHandler((_contents, permission, requestingOrigin, details) => (
+    allowsRendererPermission(origin, requestingOrigin, permission, details.isMainFrame)
+  ))
+  mainWindow.webContents.session.setPermissionRequestHandler((contents, permission, callback, details) => {
+    callback(
+      contents === mainWindow.webContents
+      && allowsRendererPermission(origin, details.requestingUrl, permission, details.isMainFrame),
+    )
+  })
   mainWindow.on('close', (event) => {
     if (quitting || !config.behavior.closeToTray) return
     event.preventDefault()
