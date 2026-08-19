@@ -26,7 +26,7 @@
     "dist": "tsx prepare-runtime.mjs && tsx assemble-windows.mjs && electron-builder --prepackaged release/win-unpacked --win nsis"
   },
   "devDependencies": {
-    "@electron/asar": "3.4.1",
+    "@electron/asar": "4.2.0",
     "app-builder-lib": "26.15.3",
     "electron": "43.4.0",
     "electron-builder": "26.15.3",
