@@ -30,7 +30,7 @@
     "app-builder-lib": "26.15.3",
     "electron": "43.4.0",
     "electron-builder": "26.15.3",
-    "tsx": "^4.22.4"
+    "tsx": "^4.23.1"
   },
   "build": {
     "appId": "ai.deepseek.harness.desktop",
