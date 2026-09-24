@@ -1,0 +1,21 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib/types",
+    "allowJs": true,
+    "checkJs": false
+  },
+  "include": ["src"],
+  "exclude": ["src/client.js"],
+  "references": [
+    { "path": "../../../vendor/cosmokit" },
+    { "path": "../../../vendor/cordis" },
+    { "path": "../../../vendor/schemastery" },
+    { "path": "../../attachment/attachment" },
+    { "path": "../../llm/llm" },
+    { "path": "../../core/tools" },
+    { "path": "../../settings/settings" },
+    { "path": "../../runtime-diagnostics/invariants" }
+  ]
+}
