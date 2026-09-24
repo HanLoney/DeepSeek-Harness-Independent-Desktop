@@ -1,0 +1,231 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 2px 24px;
+  color: var(--dsw-alias-text-primary);
+  font-size: 13px;
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.intro {
+  margin: 0;
+  color: var(--dsw-alias-label-secondary);
+  line-height: 1.5;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hint {
+  margin: 0;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.error {
+  margin: 0;
+  color: var(--dsw-alias-state-error-primary);
+}
+
+.projectGroups {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.projectGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.projectHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.projectHeading {
+  margin: 0;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.projectCount {
+  color: var(--dsw-alias-label-tertiary);
+  font-weight: 400;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  list-style: none;
+  /* Elevated surface: the rows below paint on `--dsw-alias-bg-layer-2`, so the
+     scrollbar thumb over them takes the l2 elevation tokens. Declared on this
+     scroll container so the elevation choice sits with the scrolling element;
+     see ui-theme styles/scrollbar.css for the rebinding contract. */
+  --dsh-scrollbar-thumb: var(--dsw-alias-scrollbar-bg-l2);
+  --dsh-scrollbar-thumb-hover: var(--dsw-alias-scrollbar-hover-l2);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--dsw-alias-border-subtle);
+  border-radius: 8px;
+  background: var(--dsw-alias-bg-layer-2);
+}
+
+.rowText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-inline-size: 0;
+}
+
+.rowTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.rowMeta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--dsw-alias-label-tertiary);
+  font-size: 12px;
+}
+
+.dryRun {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.logHeading {
+  margin: 8px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.run {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.runHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.runTarget {
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+}
+
+.running { color: var(--dsw-alias-state-warn-label); }
+.completed { color: var(--dsw-alias-state-success-primary); }
+.failed { color: var(--dsw-alias-state-error-primary); }
+
+.stage {
+  color: var(--dsw-alias-label-tertiary);
+  font-size: 12px;
+}
+
+.bar {
+  block-size: 6px;
+  border-radius: 3px;
+  background: var(--dsw-alias-border-subtle);
+  overflow: hidden;
+}
+
+.barFill {
+  block-size: 100%;
+  background: var(--dsw-alias-brand-primary);
+  transition: inline-size 200ms ease-out;
+}
+
+.log {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 8px 10px;
+  max-height: 260px;
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid var(--dsw-alias-border-subtle);
+  border-radius: 8px;
+  background: var(--dsw-alias-bg-module-platform);
+  /* Elevated surface, same rebinding contract as `.rows` above. */
+  --dsh-scrollbar-thumb: var(--dsw-alias-scrollbar-bg-l2);
+  --dsh-scrollbar-thumb-hover: var(--dsw-alias-scrollbar-hover-l2);
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.logInfo { color: var(--dsw-alias-label-secondary); }
+.logWarn { color: var(--dsw-alias-state-warn-label); }
+.logError { color: var(--dsw-alias-state-error-primary); }
+
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--dsw-alias-border-subtle);
+  border-radius: 8px;
+  background: var(--dsw-alias-bg-layer-2);
+}
+
+.resultSummary {
+  margin: 0;
+  font-weight: 500;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 12px;
+  margin: 0;
+  font-size: 12px;
+}
+
+.fact {
+  display: contents;
+}
+
+.fact dt {
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.fact dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-family: ui-monospace, monospace;
+}

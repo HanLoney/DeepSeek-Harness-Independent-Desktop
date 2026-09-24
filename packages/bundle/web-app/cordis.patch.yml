@@ -94,6 +94,13 @@
     - id: plugin-inventory
       name: '@deepseek-ai/dsh-host-plugin-inventory'
 
+    # Codex bridge Host half: the '/codex-bridge' RPC channel the Codex Bridge
+    # settings page calls to list threads and sessions, run an import or
+    # export, and read the run's progress log. Loopback-only, because the
+    # operations read and write the user's home directories.
+    - id: codex-bridge-host
+      name: '@deepseek-ai/dsh-codex-bridge-host'
+
     # The API gateway: the transport-agnostic dispatch face every client shape
     # shares. The base layer's agent-default-model service owns the default model.
     - id: api-gateway
@@ -236,6 +243,12 @@
     # Background jobs: the session-header list over the jobsBySession mirror.
     - id: ui-jobs
       name: '@deepseek-ai/dsh-client-ui-jobs'
+
+    # Codex bridge: the settings page that imports Codex threads and exports
+    # DSH sessions, with its progress log. Its Host half registers the
+    # '/codex-bridge' RPC channel this page calls.
+    - id: ui-codex-bridge
+      name: '@deepseek-ai/dsh-client-ui-codex-bridge'
 
     # Goal surface: GoalBar in the input dock over the goal session projection.
     - id: ui-goal
