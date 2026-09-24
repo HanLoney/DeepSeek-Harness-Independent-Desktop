@@ -30,6 +30,9 @@ export const defaultConfig = Object.freeze({
     port: 0,
     workspace: '',
   },
+  widget: {
+    enabled: true,
+  },
 })
 
 function record(value, path) {
@@ -78,6 +81,7 @@ export function normalizeConfig(value) {
   const shortcuts = record(root.shortcuts, 'shortcuts')
   const appearance = record(root.appearance, 'appearance')
   const backend = record(root.backend, 'backend')
+  const widget = record(root.widget, 'widget')
 
   const minWidth = integer(window.minWidth, defaultConfig.window.minWidth, 'window.minWidth', 640, 7680)
   const minHeight = integer(window.minHeight, defaultConfig.window.minHeight, 'window.minHeight', 480, 4320)
@@ -114,6 +118,9 @@ export function normalizeConfig(value) {
     backend: {
       port: integer(backend.port, defaultConfig.backend.port, 'backend.port', 0, 65535),
       workspace: string(backend.workspace, defaultConfig.backend.workspace, 'backend.workspace'),
+    },
+    widget: {
+      enabled: boolean(widget.enabled, defaultConfig.widget.enabled, 'widget.enabled'),
     },
   }
 }

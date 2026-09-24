@@ -18,6 +18,7 @@ test('stages every distributable desktop file for app.asar', async () => {
       'main.mjs',
       'package.json',
       'permissions.mjs',
+      'widget',
     ])
     const packagedManifest = JSON.parse(await readFile(join(target, 'package.json'), 'utf8'))
     assert.equal(packagedManifest.version, manifest.version)

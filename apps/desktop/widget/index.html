@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src 'self'; img-src 'self'; media-src 'self'; style-src 'self'; script-src 'self'" />
+    <title>任务挂件</title>
+    <link rel="stylesheet" href="/widget/widget.css" />
+  </head>
+  <body>
+    <div id="stage">
+      <div id="bubble" class="bubble" hidden>
+        <div class="bubble-head">
+          <span id="phase" class="phase">空闲</span>
+          <span class="head-right">
+            <span id="mute" class="mute" hidden>🔇</span>
+            <span id="clock" class="clock">0:00</span>
+          </span>
+        </div>
+        <div class="bubble-body">
+          <div id="title" class="title" hidden></div>
+          <div id="tools" class="tools"></div>
+          <div id="todos" class="todos" hidden>
+            <div class="todos-head"><span>清单</span><span id="todos-count">0 / 0</span></div>
+            <div class="todos-bar"><i id="todos-fill"></i></div>
+            <div id="todos-current" class="todos-current"></div>
+          </div>
+          <div id="goal" class="goal" hidden>
+            <div class="goal-head"><span>目标</span><span id="goal-rounds"></span></div>
+            <div id="goal-text" class="goal-text"></div>
+          </div>
+          <div id="stats" class="stats"></div>
+        </div>
+      </div>
+      <!-- The whale carries the state: it is the window's only always-visible part. -->
+      <img id="whale" src="/widget/assets/DSniang1.png" alt="" draggable="false" />
+    </div>
+    <script type="module" src="/widget/renderer.js"></script>
+  </body>
+</html>

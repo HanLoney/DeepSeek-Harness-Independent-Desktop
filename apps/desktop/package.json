@@ -18,7 +18,8 @@
     "assets",
     "config.mjs",
     "main.mjs",
-    "permissions.mjs"
+    "permissions.mjs",
+    "widget"
   ],
   "scripts": {
     "start": "electron .",

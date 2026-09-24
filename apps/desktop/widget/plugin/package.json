@@ -1,0 +1,25 @@
+{
+  "name": "dsh-plugin-desktop-widget",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Enable/disable switch for the DeepSeek Harness Desktop task widget",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./index.js"
+    },
+    "./client": {
+      "default": "./client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web"
+    }
+  },
+  "files": [
+    "index.js",
+    "client.js"
+  ]
+}

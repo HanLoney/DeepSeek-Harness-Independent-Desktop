@@ -1,0 +1,247 @@
+/* Widget surface. Only the artwork comes from the upstream project; the
+   layout, palette and type are this widget's own. */
+
+:root {
+  color-scheme: dark;
+  --whale-bg: rgba(22, 25, 32, 0.93);
+  --whale-border: rgba(255, 255, 255, 0.10);
+  /* Read against the balloon's white interior, not against the dark desktop. */
+  --whale-text: #1b2333;
+  /* The closing states carry their own dark surface instead of a balloon. */
+  --whale-card-text: #e8eaf0;
+  --whale-muted: #6b7690;
+  --whale-accent: #2f6fd0;
+  --whale-tool: #b8730c;
+  --whale-stream: #6d4bc4;
+  --whale-done: #1f8f57;
+  --whale-warn: #c62f2c;
+}
+
+* { box-sizing: border-box; }
+
+/* A layout rule on a class (`display: flex`) outranks the attribute selector the
+   user agent uses for `hidden`, so hiding an element by attribute only works if
+   this rule wins for every element that has its own display. */
+[hidden] { display: none !important; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+  font-family: "Microsoft YaHei UI", "Segoe UI", system-ui, sans-serif;
+  color: var(--whale-text);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Deliberately not -webkit-app-region: drag. The window manager treats a drag
+   region as a title bar, and a right click inside one never reaches the page —
+   the exact click the widget's context menu needs. The renderer moves the window
+   from the pointer instead, so the whole drawn box is draggable and
+   right-clickable at once. */
+#stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  -webkit-app-region: no-drag;
+}
+
+/* One image swap carries every whale state; the renderer replaces the source.
+   The working artwork is much larger because it draws the thought balloon the
+   bubble's text sits inside; the others are close-up faces with no balloon.
+
+   The artwork paints that balloon, so the text must stack above it: both are
+   positioned, and the artwork comes later in the DOM. */
+#whale {
+  position: absolute;
+  z-index: 1;
+  right: 4px;
+  bottom: 0;
+  width: 136px;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5));
+}
+#whale[data-art="thinking"] { width: 270px; }
+#whale[data-art="celebrate"] { width: 148px; }
+
+/* The balloon is painted into the artwork, so the text drawn inside it has to
+   ride the same motion: animating only the image slides the artwork out from
+   under stationary text. Both animations share one timing declaration, which is
+   what keeps them in phase — two separately declared animations of equal length
+   still drift if their elements start them at different moments.
+
+   The text follows the rise but not the swell: scaling 11px glyphs by 1.5% blurs
+   them for no visible gain, while the same scale on the artwork reads as breath. */
+#whale.working,
+.bubble.working { animation: bob 2.6s ease-in-out infinite; }
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.015); }
+}
+
+.bubble.working { animation-name: bob-text; }
+
+@keyframes bob-text {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* Only the working artwork draws a balloon, so the text has two homes: inside
+   that balloon while a turn runs, and on a surface of its own once it ends.
+   Geometry therefore comes from the artwork state, never from this base rule. */
+.bubble {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: var(--whale-text);
+  font-size: 11px;
+  line-height: 1.35;
+  text-align: center;
+}
+
+/* Inside the drawn balloon. It is an ellipse, so the text box is inset well
+   within its bounding rectangle: text filling the rectangle spills past the
+   curve on the top and bottom rows. Anchored by its bottom edge and centred in
+   the ellipse's upper lobe, clear of the tail, a fuller state grows upward
+   through the empty half instead of down across the whale's face. */
+.bubble[data-art="thinking"] {
+  left: 206px;
+  bottom: 172px;
+  width: 152px;
+  min-height: 86px;
+}
+
+/* No balloon is drawn for the closing states, so the text carries its own
+   surface. Without one it would read as loose glyphs on the desktop. */
+.bubble[data-art="celebrate"],
+.bubble[data-art="idle"] {
+  left: 150px;
+  bottom: 150px;
+  width: 208px;
+  padding: 7px 11px;
+  border-radius: 11px;
+  color: var(--whale-card-text);
+  background: rgba(20, 23, 30, 0.9);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.42);
+}
+
+/* The accent colours are chosen against the balloon's white interior, so the
+   dark surface restates them at the lightness that surface needs. */
+.bubble[data-art="celebrate"] .clock,
+.bubble[data-art="idle"] .clock,
+.bubble[data-art="celebrate"] .title,
+.bubble[data-art="idle"] .title,
+.bubble[data-art="celebrate"] .stats,
+.bubble[data-art="idle"] .stats { color: #9aa3b4; }
+
+.bubble[data-art="celebrate"] .stats b,
+.bubble[data-art="idle"] .stats b { color: var(--whale-card-text); }
+
+.bubble[data-art="celebrate"] .phase[data-phase="idle"],
+.bubble[data-art="idle"] .phase[data-phase="idle"] { color: #7fd4a4; }
+
+.bubble[data-art="celebrate"] .phase[data-failure="true"],
+.bubble[data-art="idle"] .phase[data-failure="true"] { color: #ff8a87; }
+
+/* The balloon is the surface, so the header needs no backdrop of its own. */
+.bubble-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.phase { font-weight: 600; letter-spacing: 0.02em; }
+.phase[data-phase="thinking"] { color: var(--whale-accent); }
+.phase[data-phase="streaming"] { color: var(--whale-stream); }
+.phase[data-phase="tools"] { color: var(--whale-tool); }
+.phase[data-phase="blocked"] { color: var(--whale-warn); }
+.phase[data-phase="idle"] { color: var(--whale-muted); }
+
+.clock { color: var(--whale-muted); font-variant-numeric: tabular-nums; }
+
+.head-right { display: flex; align-items: center; gap: 5px; }
+.mute { font-size: 10px; }
+
+.bubble-body { margin-top: 2px; }
+
+/* The session title, truncated to one line: it names which task the figures
+   below belong to when more than one session has run. */
+.title {
+  margin-bottom: 5px;
+  color: var(--whale-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A failed turn must not read as a finished one. */
+.phase[data-failure="true"] { color: var(--whale-warn); }
+
+.tools { display: flex; flex-direction: column; gap: 3px; }
+.tool {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--whale-tool);
+}
+.tool .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tool .ms { color: var(--whale-muted); font-variant-numeric: tabular-nums; }
+
+.todos { margin-top: 8px; }
+.todos-head, .goal-head {
+  display: flex;
+  justify-content: space-between;
+  color: var(--whale-muted);
+  margin-bottom: 4px;
+}
+.todos-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(27, 35, 51, 0.13);
+  overflow: hidden;
+}
+.todos-bar i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--whale-done);
+  transition: width 220ms ease-out;
+}
+.todos-current {
+  margin-top: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goal { margin-top: 8px; }
+.goal-text {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 5px;
+  color: var(--whale-muted);
+  font-variant-numeric: tabular-nums;
+}
+.stats b { color: var(--whale-text); font-weight: 600; }
+
+/* The upstream coin artwork marks the token figure. It is a 500x399 animation,
+   so it is fitted rather than stretched into a square. */
+.stats .coin { width: 20px; height: 20px; object-fit: contain; flex: none; }
+.stats .chip { display: flex; align-items: center; gap: 5px; }
